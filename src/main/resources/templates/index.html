@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+
+<body>
+
+    <div id="app">
+        <el-tabs v-model="table" @tab-click="changeTable">
+            <el-tab-pane :label="t.name" :name="t.table" v-for="t in tables"></el-tab-pane>
+        </el-tabs>
+        <div class="sear">
+            <el-input class="sear_input" v-model="searText" placeholder="请输入内容"></el-input>
+            <el-button icon="el-icon-search" circle @click="sear()"></el-button>
+            <el-button type="primary" @click="refresh()">刷新</el-button>
+        </div>
+        <el-table :data="tableData" border style="width: 100%" height="400">
+            <div v-for="t in title">
+                <el-table-column fixed :prop="t.field" :label="t.name" >
+                </el-table-column>
+            </div>
+            <el-table-column fixed="right" label="操作" width="100">
+                <template slot-scope="scope">
+                    <!--                    <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>-->
+                    <el-button type="text" size="small" @click="deletedata(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination class="pagination" background layout="prev, pager, next" @current-change="currentChange" :total="totalNum">
+        </el-pagination>
+    </div>
+</body>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script th:inline="javascript">
+new Vue({
+    el: '#app',
+    data: function() {
+        return {
+            tableData: [],
+            title: [],
+            totalNum: 0,
+            searText: "",
+            current: "",
+            tables:[],
+            table: ""
+        }
+    },
+    methods: {
+        deletedata(row) {
+            var that = this;
+            console.log(row);
+            $.post("data/dele/" + row.id, function(data, status) {
+
+                if (status == "success" && data == "1") {
+                    $.post("data/get/0/6", function(data, status) {
+                        that.tableData = data.records;
+                        that.totalNum = data.total;
+                        console.log(that.tableData)
+                        that.$message('删除成功');
+                    });
+                }
+
+            });
+        },
+        load() {
+             var data = [[${data}]];
+             this.tableData = data.records;
+              var tables = [[${tables}]];
+              this.tables = tables;
+              this.table = [[${tablename}]];
+              var title = [[${title}]];
+              this.title = title;
+              this.totalNum = data.total;
+              this.$message('加载成功');
+        },
+        sear() {
+
+            var data = this.searText;
+            var that = this;
+            $.post("data/sear/" + data, function(data, status) {
+                if (status == "success") {
+                    that.tableData = data;
+                    console.log(data)
+                }
+            });
+        },
+        refresh() {
+            var that = this;
+            $.post("data/get/" + that.current + "/6", function(data, status) {
+                that.tableData = data.records;
+                that.totalNum = data.total;
+                console.log(that.tableData)
+                that.$message('加载成功');
+            });
+        },
+        currentChange(val) {
+            var that = this;
+            this.current = val;
+            $.post("data/get/" + val + "/6", function(data, status) {
+                that.tableData = data.records;
+                that.totalNum = data.total;
+                console.log(that.tableData)
+                that.$message('加载成功');
+            });
+        },
+        changeTable(){
+
+        }
+    },
+    mounted: function() {
+        this.load();
+    }
+})
+</script>
+<style>
+#app {
+    width: 80%;
+    margin-left: 8%;
+    margin-top: 50px;
+}
+
+.sear {
+    width: 30%;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+}
+
+.sear_input {
+    margin-right: 30px;
+}
+
+.pagination {
+    margin-top: 10px;
+}
+</style>
+
+</html>

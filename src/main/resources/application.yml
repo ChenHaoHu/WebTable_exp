@@ -1,0 +1,20 @@
+
+# DataSource Config
+spring:
+  datasource:
+    driver-class-name:  com.mysql.cj.jdbc.Driver
+#    schema: classpath:db/schema-mysql.sql
+#    data: classpath:db/data-mysql.sql
+    url: jdbc:mysql://120.78.174.107:3306/gotest
+    username: hcy
+    password: hcy
+    druid:
+      web-stat-filter:
+        enabled: true
+  thymeleaf:
+    cache: false
+#
+#logging:
+#  level:
+#    top.hcy.mybatisplus.mapper: debug
+
