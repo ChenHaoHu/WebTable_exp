@@ -1,22 +1,20 @@
-package top.hcy.mybatisplus.config;
+package top.hcy.webtable.config;
 
 
 import org.reflections.Reflections;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import top.hcy.mybatisplus.annotation.WebMapper;
-import top.hcy.mybatisplus.annotation.WebTable;
+import top.hcy.webtable.annotation.WebMapper;
+import top.hcy.webtable.annotation.WebTable;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 @Configuration
 public class AnnotateConfig {
 
-    String packageName = "top.hcy.mybatisplus";
+    String packageName = "top.hcy.webtable";
 
 
     @Bean
@@ -40,6 +38,22 @@ public class AnnotateConfig {
         }
         return map;
     }
+
+
+
+    @Bean
+    public HashMap<String,Class> webEntityClass(){
+        Reflections f = new Reflections(packageName);
+        Set<Class<?>> set = f.getTypesAnnotatedWith(WebTable.class);
+        HashMap<String,Class> map =new HashMap<>();
+        Iterator<Class<?>> iterator = set.iterator();
+        while (iterator.hasNext()){
+            Class<?> next = iterator.next();
+            map.put(next.getSimpleName(),next);
+        }
+        return map;
+    }
+
 
 
 

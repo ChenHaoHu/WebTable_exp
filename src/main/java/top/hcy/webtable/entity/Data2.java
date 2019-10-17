@@ -1,4 +1,4 @@
-package top.hcy.mybatisplus.entity;
+package top.hcy.webtable.entity;
 
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -7,20 +7,20 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import top.hcy.mybatisplus.annotation.WebField;
-import top.hcy.mybatisplus.annotation.WebTable;
+import top.hcy.webtable.annotation.WebField;
+import top.hcy.webtable.annotation.WebTable;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("data")
-@WebTable("测试表2")
-public class User2 {
+@TableName("data2")
+@WebTable("测试表-副")
+public class Data2 {
 
     @TableId(type = IdType.AUTO)
-    @WebField("序号")
+    @WebField("序号--")
     private Long id;
-    @WebField("名字")
+    @WebField
     private String name;
     @WebField
     private Integer age;

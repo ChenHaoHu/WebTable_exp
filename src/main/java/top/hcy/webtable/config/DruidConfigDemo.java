@@ -1,4 +1,4 @@
-package top.hcy.mybatisplus.config;
+package top.hcy.webtable.config;
 
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;

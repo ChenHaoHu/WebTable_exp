@@ -1,21 +1,18 @@
-package top.hcy.mybatisplus.entity;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+package top.hcy.webtable.entity;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.hcy.mybatisplus.mapper.UserMapper;
+import top.hcy.webtable.mapper.Data1Mapper;
 
 import javax.sql.DataSource;
 import java.util.concurrent.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class UserTest {
+public class Data2Test {
 
 
     @Autowired
@@ -23,13 +20,13 @@ public class UserTest {
 
 
     @Autowired
-    private UserMapper userMapper;
+    private Data1Mapper data1Mapper;
 
     @Test
     public void testSelect() {
         System.out.println(("----- selectAll method test ------"));
-        userMapper.deleteById(1);
-//        List<User> userList = userMapper.selectList(null);
+        data1Mapper.deleteById(1);
+//        List<Data2> userList = data1Mapper.selectList(null);
 //
 //        Assert.assertEquals(4, userList.size());
 //        userList.forEach(System.out::println);
@@ -39,9 +36,9 @@ public class UserTest {
     @Test
     public void insertData() {
 
-        User user = null;
+        Data2 user = null;
         for (int i = 0; i < 10000; i++) {
-//            userMapper.insert(new User("hcy"+i,i%100,"775656"+i+"@qq.com"));
+//            data1Mapper.insert(new Data2("hcy"+i,i%100,"775656"+i+"@qq.com"));
             System.out.println(i);
         }
 
@@ -49,7 +46,7 @@ public class UserTest {
 
     @Test
     public void insertData1() {
-        //    User user = userMapper.selectById(10);
+        //    Data2 user = data1Mapper.selectById(10);
 //        System.out.println(user);
 //        System.out.println(user.getData1());
     }
@@ -57,10 +54,10 @@ public class UserTest {
 
     @Test
     public void page() {
-        Page <User> page = new Page<>(1,10);
-        IPage<User> userIPage = userMapper.selectPage(page,null);
-
-        System.out.println(userIPage.toString());
+//        Page <Data2> page = new Page<>(1,10);
+//        IPage<Data2> userIPage = data1Mapper.selectPage(page,null);
+//
+//        System.out.println(userIPage.toString());
     }
 
     @Test
@@ -71,7 +68,7 @@ public class UserTest {
         final  int thread_count  = 3000;
 
         long start = System.currentTimeMillis();
-        // int i = userMapper.insertSQL("insert into my(name,age,email) VALUES('hcy0',0,'77565674@qq.com'),('hcy0',0,'77565670@qq.com'),('hcy1',1,'77565671@qq.com');");
+        // int i = data1Mapper.insertSQL("insert into my(name,age,email) VALUES('hcy0',0,'77565674@qq.com'),('hcy0',0,'77565670@qq.com'),('hcy1',1,'77565671@qq.com');");
         // System.out.println(i);
         CountDownLatch  countDownLatch = new CountDownLatch(thread_count);
         Runnable runnable = new Runnable() {
@@ -83,7 +80,7 @@ public class UserTest {
                 }
                 sql = sql.append(";") ;
                 System.out.println("sql ok "+Thread.currentThread().getName());
-                int i = userMapper.insertSQL(sql.toString());
+                int i = data1Mapper.insertSQL(sql.toString());
                 countDownLatch.countDown();
                 System.out.println(System.currentTimeMillis()+"-----------"+i+"---------"+Thread.currentThread());
             }

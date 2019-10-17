@@ -1,4 +1,4 @@
-package top.hcy.mybatisplus.controller;
+package top.hcy.webtable.controller;
 
 
 
@@ -6,20 +6,20 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.ibatis.annotations.Mapper;
-import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import top.hcy.mybatisplus.annotation.WebField;
-import top.hcy.mybatisplus.annotation.WebTable;
-import top.hcy.mybatisplus.entity.User;
-import top.hcy.mybatisplus.mapper.UserMapper;
+import top.hcy.webtable.annotation.WebField;
+import top.hcy.webtable.annotation.WebTable;
+import top.hcy.webtable.entity.Data2;
+import top.hcy.webtable.mapper.Data1Mapper;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Field;
@@ -27,15 +27,18 @@ import java.util.*;
 import java.util.function.Consumer;
 
 @Controller
-public class testController {
+public class WebTableController {
 
 
     @Autowired
-    UserMapper userMapper;
+    Data1Mapper data1Mapper;
 
 
     @Autowired
     Set<Class<?>> webTableClass;
+
+    @Autowired
+    HashMap<String,Class> webEntityClass;
 
 
     @Autowired
@@ -59,15 +62,34 @@ public class testController {
     }
 
 
-    @RequestMapping("/bb")
-    public String test2(Model model , HttpServletRequest request,HttpSession httpSession){
-
-        return "bb";
+    @RequestMapping("/out")
+    public String loginOut(Model model , HttpServletRequest request,HttpSession httpSession){
+        httpSession.removeAttribute("login");
+        return "login";
     }
 
-    @RequestMapping("/")
-    public  String index(Model model,HttpServletRequest httpServletRequest){
-        String table = null;
+    @RequestMapping("/login")
+    @PostMapping
+    public String loginIn(Model model , HttpServletRequest request,HttpSession httpSession){
+        String user = request.getParameter("name");
+        String passwd = request.getParameter("passwd");
+        if (user.equals("admin")&&passwd.equals("admin")){
+            httpSession.setAttribute("login","true");
+            return  "redirect:/";
+        }
+        model.addAttribute("msg","登录失败");
+        return "login";
+    }
+
+    @RequestMapping(value = {"/{table}","/"})
+    public  String index(Model model,@Nullable @PathVariable("table")String table,HttpSession session){
+        String login = (String)session.getAttribute("login");
+        if (login!="true"){
+            return "/login";
+        }
+        if (" ".equals(table)){
+            table = null;
+        }
         BaseMapper mapper = null;
         List<HashMap<String,String>> tables = new ArrayList<>();
         HashMap<String,String> map = null;
@@ -92,21 +114,21 @@ public class testController {
 
             }
         }
-        if (tables.size()<0){
+        if (tables.size()<0 || table == null){
             //没有表字段
             return "index.html";
         }
-       // System.out.println(table);
         Class mapperClass = webMapperClass.get(table);
+        Class entity = webEntityClass.get(table);
         //System.out.println(mapperClass);
         mapper = (BaseMapper)auto.getBean(mapperClass);
         model.addAttribute("tablename",table);
         model.addAttribute("tables",tables);
-        Page<User> page = new Page<>(1,6);
-        IPage<User> mapIPage = mapper.selectPage(page, null);
+        Page<Object> page = new Page<>(1,6);
+        IPage<Object> mapIPage = mapper.selectPage(page, null);
         model.addAttribute("data",mapIPage);
         List<Map<String,String>> titles = new ArrayList<>();
-        Field[] declaredFields = User.class.getDeclaredFields();
+        Field[] declaredFields = entity.getDeclaredFields();
         for (int i = 0; i < declaredFields.length; i++) {
             WebField webField = declaredFields[i].getAnnotation(WebField.class);
             if (webField != null){
@@ -130,35 +152,51 @@ public class testController {
         return "index.html";
     }
 
-    @RequestMapping("/data/dele/{id}")
+    @RequestMapping("/data/dele/{table}/{id}")
     @ResponseBody
-    public  int deleteData(@PathVariable("id")Integer id){
-        int i = userMapper.deleteById(id);
+    public  int deleteData(@PathVariable("table")String table,
+                           @PathVariable("id")Integer id){
+        BaseMapper mapper = null;
+        Class mapperClass = webMapperClass.get(table);
+        mapper = (BaseMapper)auto.getBean(mapperClass);
+        int i = mapper.deleteById(id);
         return i;
     }
 
-    @RequestMapping("/data/get/{page}/{size}")
+    @RequestMapping("/data/get/{table}/{page}/{size}")
     @ResponseBody
-    public IPage deleteData(@PathVariable("page")Integer page,
+    public IPage deleteData(@PathVariable("table")String table,
+                            @PathVariable("page")Integer page,
                             @PathVariable("size")Integer size){
-        Page<User> userPage = new Page<>(page,size);
-        IPage<User> mapIPage = userMapper.selectPage(userPage, null);
+        BaseMapper mapper = null;
+        Class mapperClass = webMapperClass.get(table);
+        Class entity = webEntityClass.get(table);
+        //System.out.println(mapperClass);
+        mapper = (BaseMapper)auto.getBean(mapperClass);
+        Page<Object> objectPage = new Page<>(page,size);
+        IPage<Object> mapIPage = mapper.selectPage(objectPage, null);
         return mapIPage;
     }
 
 
-    @RequestMapping("/data/sear/{text}")
+    @RequestMapping("/data/sear/{table}/{text}")
     @ResponseBody
-    public List searData(@PathVariable("text")String text){
-        QueryWrapper<User>  queryWrapper = new QueryWrapper();
-        Consumer<QueryWrapper<User>> query = userQueryWrapper -> {
-            Field[] declaredFields = User.class.getDeclaredFields();
+    public List searData( @PathVariable("table")String table,
+                          @PathVariable("text")String text){
+        BaseMapper mapper = null;
+        Class mapperClass = webMapperClass.get(table);
+        Class entity = webEntityClass.get(table);
+        //System.out.println(mapperClass);
+        mapper = (BaseMapper)auto.getBean(mapperClass);
+        QueryWrapper<Object>  queryWrapper = new QueryWrapper();
+        Consumer<QueryWrapper<Object>> query = userQueryWrapper -> {
+            Field[] declaredFields = Data2.class.getDeclaredFields();
             for (int i = 0; i < declaredFields.length; i++) {
                 userQueryWrapper.like(declaredFields[i].getName(), text).or();
             }
         };
         queryWrapper.and(query);
-        List<User> users = userMapper.selectList(queryWrapper);
-        return users;
+        List data = mapper.selectList(queryWrapper);
+        return data;
     }
 }

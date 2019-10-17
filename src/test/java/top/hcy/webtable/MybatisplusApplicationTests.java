@@ -1,4 +1,4 @@
-package top.hcy.mybatisplus;
+package top.hcy.webtable;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package top.hcy.mybatisplus.annotation;
+package top.hcy.webtable.annotation;
 
 import java.lang.annotation.*;
 
@@ -6,6 +6,6 @@ import java.lang.annotation.*;
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface WebMapper {
-    Class value();
+public @interface WebTable {
+    String value() default "";
 }

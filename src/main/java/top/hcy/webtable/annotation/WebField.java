@@ -1,4 +1,4 @@
-package top.hcy.mybatisplus.annotation;
+package top.hcy.webtable.annotation;
 
 import java.lang.annotation.*;
 

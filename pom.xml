@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>top.hcy</groupId>
-    <artifactId>mybatisplus</artifactId>
+    <artifactId>webtable</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>mybatisplus</name>
+    <name>webtable</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
