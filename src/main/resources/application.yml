@@ -6,8 +6,8 @@ spring:
 #    schema: classpath:db/schema-mysql.sql
 #    data: classpath:db/data-mysql.sql
     url: jdbc:mysql://120.78.174.107:3306/gotest
-    username: hcy
-    password: hcy
+    username: *****
+    password: *****
     druid:
       web-stat-filter:
         enabled: true
